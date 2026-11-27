@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign the Petition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* VOICE: calm, civic, trustworthy — a sign-up desk, not an ad
+   IDEA: the paper petition sheet, one signer at a time
+   PICTURE: the form and signature pad are the picture; the exported page previews below
+   COLOUR and TYPE: white ground, deep civic blue field, ink near-black; Figtree 800 + Figtree
+   LAYOUT: one blue band with the title, then one calm column of fields */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0f141b);--ink:light-dark(#16181d,#eef1f5);--muted:light-dark(#4a515c,#a9b2bf);
+--line:light-dark(#c9cdd3,#36404c);--field:light-dark(#f6f7f9,#18202a);--blue:#1f3a5f;--blue2:light-dark(#1f3a5f,#8fb3e0);
+--err:light-dark(#b42318,#ff8f85);--pad:light-dark(#ffffff,#f4f5f7)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,sans-serif;overflow-x:clip}
+.top{background:var(--blue);color:#fff;padding:clamp(28px,5vw,56px) max(5vw,16px) clamp(24px,4vw,40px)}
+.wrap{max-width:640px;margin:0 auto}
+.kicker{font-size:14px;font-weight:600;opacity:.85;margin:0 0 6px}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.08;font-weight:800;margin:0 0 14px;text-wrap:balance}
+.statement{margin:0;font-size:17px;line-height:1.55;color:#e8eef6}
+.statement strong{color:#fff}
+main{padding:clamp(24px,4vw,44px) max(5vw,16px) 64px}
+form{display:grid;gap:18px}
+label{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
+.opt{font-weight:400;color:var(--muted)}
+input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--field);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;min-height:48px}
+input:focus,button:focus-visible,canvas:focus-visible{outline:3px solid var(--blue2);outline-offset:2px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.err{color:var(--err);font-size:14px;margin-top:4px;min-height:0}
+.err:empty{display:none}
+.sighead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:6px}
+.sighead label{margin:0}
+.padwrap{position:relative;height:200px;border:1.5px dashed var(--line);border-radius:12px;background:var(--pad);overflow:hidden}
+.padwrap canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.baseline{position:absolute;left:20px;right:20px;bottom:46px;border-bottom:1.5px solid #9aa0a8;pointer-events:none}
+.x{position:absolute;left:22px;bottom:50px;font-size:22px;color:#9aa0a8;pointer-events:none}
+.hint{position:absolute;inset:auto 0 14px;text-align:center;font-size:14px;color:#6b7280;pointer-events:none}
+.padwrap.signed .hint{display:none}
+button{font:inherit;font-weight:600;font-size:16px;min-height:48px;border-radius:10px;padding:0 20px;cursor:pointer;border:1.5px solid transparent}
+.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.primary:hover{background:#142842}
+.ghost{background:transparent;color:var(--blue2);border-color:var(--line)}
+.link{background:none;border:0;color:var(--blue2);min-height:44px;padding:0 4px;text-decoration:underline}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+.note{font-size:14px;color:var(--muted);margin:0}
+#done{display:none;margin-top:36px;border-top:1px solid var(--line);padding-top:28px}
+#done.show{display:block}
+#done h2{font-size:26px;line-height:1.15;margin:0 0 6px;font-weight:800}
+.preview{margin:18px 0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 10px 30px rgba(15,20,27,.12)}
+.preview img{display:block;width:100%;height:auto}
+#status{font-size:15px;margin:10px 0 0;min-height:24px}
+#status.bad{color:var(--err)}
+@media(max-width:600px){.row2{grid-template-columns:minmax(0,1fr)}.actions button{flex:1 1 100%}}
+@media(prefers-reduced-motion:no-preference){#done.show{animation:rise .35s ease-out}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<header class="top">
+<div class="wrap">
+<p class="kicker">Petition of support · City of Brampton</p>
+<h1>Daycare, JK–12 School &amp; Sikh Gurdwara at 0 Countryside Drive</h1>
+<p class="statement">By signing below, I confirm that I support the proposed development of a <strong>Daycare, JK–12 School, and Sikh Gurdwara</strong> at the <strong>northwest corner of Countryside Drive and Coleraine Drive</strong> in the City of Brampton (0 Countryside Drive).</p>
+</div>
+</header>
+
+<main>
+<div class="wrap">
+<form id="f" novalidate>
+<div>
+<label for="name">Full name</label>
+<input id="name" autocomplete="name" required>
+<div class="err" id="e-name"></div>
+</div>
+<div>
+<label for="addr">Address</label>
+<input id="addr" autocomplete="address-line1" placeholder="e.g. 123 Main Street, Unit 4" required>
+<div class="err" id="e-addr"></div>
+</div>
+<div class="row2">
+<div>
+<label for="city">City</label>
+<input id="city" autocomplete="address-level2" required>
+<div class="err" id="e-city"></div>
+</div>
+<div>
+<label for="postal">Postal code</label>
+<input id="postal" autocomplete="postal-code" placeholder="A1A 1A1" maxlength="7" autocapitalize="characters" required>
+<div class="err" id="e-postal"></div>
+</div>
+</div>
+<div class="row2">
+<div>
+<label for="phone">Phone</label>
+<input id="phone" type="tel" autocomplete="tel-national" inputmode="numeric" placeholder="xxx-xxx-xxxx" maxlength="12" required>
+<div class="err" id="e-phone"></div>
+</div>
+<div>
+<label for="email">Email <span class="opt">(optional)</span></label>
+<input id="email" type="email" autocomplete="email" inputmode="email">
+<div class="err" id="e-email"></div>
+</div>
+</div>
+<div>
+<div class="sighead">
+<label for="pad">Signature</label>
+<button type="button" class="link" id="clear">Clear</button>
+</div>
+<div class="padwrap" id="padwrap">
+<canvas id="pad" tabindex="0" aria-label="Signature pad: draw your signature with your finger, stylus or mouse"></canvas>
+<div class="baseline"></div><div class="x" aria-hidden="true">×</div>
+<div class="hint">Sign here with your finger or mouse</div>
+</div>
+<div class="err" id="e-sig"></div>
+</div>
+<p class="note">Your details stay on this device. Nothing is sent anywhere — you get a page to download and hand in.</p>
+<div class="actions"><button type="submit" class="primary">Create my signed page</button></div>
+</form>
+
+<section id="done" aria-live="polite">
+<h2>Your signed page is ready</h2>
+<p class="note">Download it, then send it to the petition organizer.</p>
+<div class="preview"><img id="prev" alt="Preview of your signed petition page"></div>
+<div class="actions">
+<button type="button" class="primary" id="dlpdf">Download PDF</button>
+<button type="button" class="ghost" id="dlpng">Download image (PNG)</button>
+<button type="button" class="ghost" id="again">Start a new signature</button>
+</div>
+<p id="status" role="status"></p>
+</section>
+</div>
+</main>
+
+<script>
+{
+const $ = id => document.getElementById(id);
+const pad = $('pad'), wrap = $('padwrap'), ctx = pad.getContext('2d');
+let strokes = [], cur = null, pageCanvas = null, downloads = null;
+
+function sizePad(){
+  const r = pad.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+  pad.width = Math.round(r.width * d); pad.height = Math.round(r.height * d);
+  ctx.setTransform(d,0,0,d,0,0); redraw();
+}
+function redraw(){
+  const r = pad.getBoundingClientRect();
+  ctx.clearRect(0,0,r.width,r.height);
+  ctx.strokeStyle = '#111827'; ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (const s of strokes){
+    ctx.beginPath();
+    s.forEach((p,i) => { const x = p[0]*r.width, y = p[1]*r.height; i ? ctx.lineTo(x,y) : ctx.moveTo(x,y); });
+    if (s.length === 1){ const x = s[0][0]*r.width, y = s[0][1]*r.height; ctx.lineTo(x+0.1,y+0.1); }
+    ctx.stroke();
+  }
+  wrap.classList.toggle('signed', strokes.length > 0);
+}
+function pt(e){ const r = pad.getBoundingClientRect(); return [(e.clientX-r.left)/r.width, (e.clientY-r.top)/r.height]; }
+pad.addEventListener('pointerdown', e => { e.preventDefault(); pad.setPointerCapture(e.pointerId); cur = [pt(e)]; strokes.push(cur); redraw(); $('e-sig').textContent=''; });
+pad.addEventListener('pointermove', e => { if (!cur) return; e.preventDefault(); cur.push(pt(e)); redraw(); });
+const end = () => { cur = null; };
+pad.addEventListener('pointerup', end); pad.addEventListener('pointercancel', end);
+$('clear').addEventListener('click', () => { strokes = []; redraw(); });
+const ro = new ResizeObserver(sizePad); ro.observe(wrap);
+
+function sigImage(){
+  // Render signature at high resolution, cropped to its ink
+  const W = 1200, H = 400, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  let minX=1,minY=1,maxX=0,maxY=0;
+  strokes.flat().forEach(p => { minX=Math.min(minX,p[0]); minY=Math.min(minY,p[1]); maxX=Math.max(maxX,p[0]); maxY=Math.max(maxY,p[1]); });
+  const r = pad.getBoundingClientRect(), aw = Math.max((maxX-minX)*r.width, 1), ah = Math.max((maxY-minY)*r.height, 1);
+  const k = Math.min((W-40)/aw, (H-40)/ah), ox = (W - aw*k)/2, oy = (H - ah*k)/2;
+  g.strokeStyle = '#111827'; g.lineWidth = Math.max(2.4*k, 3); g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const s of strokes){
+    g.beginPath();
+    s.forEach((p,i) => { const x = ox + (p[0]-minX)*r.width*k, y = oy + (p[1]-minY)*r.height*k; i ? g.lineTo(x,y) : g.moveTo(x,y); });
+    if (s.length === 1){ g.lineTo(ox + (s[0][0]-minX)*r.width*k + 0.5, oy + (s[0][1]-minY)*r.height*k + 0.5); }
+    g.stroke();
+  }
+  return c;
+}
+
+function wrapLines(g, text, maxW){
+  const words = text.split(/\s+/), lines = []; let line = '';
+  for (const w of words){ const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line){ lines.push(line); line = w; } else line = t; }
+  if (line) lines.push(line); return lines;
+}
+
+function renderPage(d){
+  // Letter portrait at 200 dpi: 1700 x 2200
+  const W = 1700, H = 2200, M = 150, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), F = 'Figtree, system-ui, sans-serif', CW = W - 2*M;
+  g.fillStyle = '#fff'; g.fillRect(0,0,W,H);
+  g.fillStyle = '#1f3a5f'; g.fillRect(0,0,W,22);
+  let y = M;
+  g.fillStyle = '#1f3a5f'; g.font = '600 30px ' + F; g.textBaseline = 'top';
+  g.fillText('PETITION OF SUPPORT  ·  CITY OF BRAMPTON', M, y); y += 64;
+  g.fillStyle = '#16181d'; g.font = '800 62px ' + F;
+  for (const l of wrapLines(g, 'Daycare, JK–12 School & Sikh Gurdwara at 0 Countryside Drive', CW)){ g.fillText(l, M, y); y += 74; }
+  y += 24; g.fillStyle = '#1f3a5f'; g.fillRect(M, y, CW, 5); y += 48;
+  g.fillStyle = '#16181d'; g.font = '400 34px ' + F;
+  const st = 'By signing below, I confirm that I support the proposed development of a Daycare, JK–12 School, and Sikh Gurdwara at the northwest corner of Countryside Drive and Coleraine Drive in the City of Brampton (0 Countryside Drive).';
+  for (const l of wrapLines(g, st, CW)){ g.fillText(l, M, y); y += 52; }
+  y += 60;
+  const rows = [
+    [['Full name', d.name, 1]],
+    [['Address', d.addr, 1]],
+    [['City', d.city, 0.62], ['Postal code', d.postal, 0.38]],
+    [['Phone', d.phone, 0.38], ['Email', d.email || '—', 0.62]]
+  ];
+  const GAP = 48;
+  for (const row of rows){
+    let x = M, rowH = 0;
+    const avail = CW - GAP * (row.length - 1);
+    for (const [lab, val, frac] of row){
+      const w = avail * frac; let yy = y;
+      g.fillStyle = '#4a515c'; g.font = '600 26px ' + F; g.fillText(lab.toUpperCase(), x, yy); yy += 44;
+      g.fillStyle = '#16181d'; g.font = '500 40px ' + F;
+      wrapLines(g, val, w).forEach(l => { g.fillText(l, x, yy); yy += 52; });
+      rowH = Math.max(rowH, yy - y); x += w + GAP;
+    }
+    y += rowH + 8; x = M;
+    for (const [, , frac] of row){ const w = avail * frac; g.fillStyle = '#9aa0a8'; g.fillRect(x, y, w, 2); x += w + GAP; }
+    y += 46;
+  }
+  y += 10;
+  g.fillStyle = '#4a515c'; g.font = '600 26px ' + F; g.fillText('SIGNATURE', M, y); y += 40;
+  const bh = 280; g.strokeStyle = '#c9cdd3'; g.lineWidth = 2; g.strokeRect(M, y, CW, bh);
+  const s = sigImage(), sh = bh - 40, sw = Math.min(CW - 40, sh * 3);
+  g.drawImage(s, M + (CW - sw)/2, y + 20, sw, sh); y += bh + 40;
+  g.fillStyle = '#16181d'; g.font = '500 32px ' + F;
+  g.fillText('Signed on ' + d.when, M, y);
+  g.fillStyle = '#4a515c'; g.font = '400 24px ' + F;
+  let fy = H - M + 30;
+  const note = 'Personal information on this petition is collected only to show community support for this application and may be shared with the City of Brampton for that purpose.';
+  const nl = wrapLines(g, note, CW); fy -= nl.length * 34;
+  g.fillStyle = '#c9cdd3'; g.fillRect(M, fy - 24, CW, 2); g.fillStyle = '#4a515c';
+  nl.forEach(l => { g.fillText(l, M, fy); fy += 34; });
+  return c;
+}
+
+function validate(){
+  const v = { name: $('name').value.trim(), addr: $('addr').value.trim(), city: $('city').value.trim(), postal: $('postal').value.trim().toUpperCase(), phone: $('phone').value.trim(), email: $('email').value.trim() };
+  const errs = {
+    'e-name': v.name ? '' : 'Please enter your full name.',
+    'e-addr': v.addr ? '' : 'Please enter your street address.',
+    'e-city': v.city ? '' : 'Please enter your city.',
+    'e-postal': /^[A-Z]\d[A-Z] \d[A-Z]\d$/.test(v.postal) ? '' : 'Please enter a postal code like A1A 1A1.',
+    'e-phone': /^\d{3}-\d{3}-\d{4}$/.test(v.phone) ? '' : 'Please enter a 10-digit phone number (xxx-xxx-xxxx).',
+    'e-email': !v.email || /^\S+@\S+\.\S+$/.test(v.email) ? '' : 'That email doesn’t look right.',
+    'e-sig': strokes.length ? '' : 'Please draw your signature.'
+  };
+  let first = null;
+  for (const [id, m] of Object.entries(errs)){ $(id).textContent = m; if (m && !first) first = id; }
+  if (first){ const el = first === 'e-sig' ? pad : $(first.slice(2)); el.focus(); return null; }
+  return v;
+}
+
+// Live formatting: phone as xxx-xxx-xxxx, postal code as A1A 1A1
+$('phone').addEventListener('input', e => {
+  const d = e.target.value.replace(/\D/g, '').replace(/^1(?=\d{10})/, '').slice(0, 10);
+  e.target.value = d.length > 6 ? d.slice(0,3) + '-' + d.slice(3,6) + '-' + d.slice(6) : d.length > 3 ? d.slice(0,3) + '-' + d.slice(3) : d;
+});
+$('postal').addEventListener('input', e => {
+  const s = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  e.target.value = s.length > 3 ? s.slice(0,3) + ' ' + s.slice(3) : s;
+});
+
+function safeName(n){ return (n.replace(/[^A-Za-z0-9 _-]/g,'').trim().replace(/\s+/g,'-') || 'Signer'); }
+
+$('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  const v = validate(); if (!v) return;
+  v.when = new Date().toLocaleString('en-CA', { dateStyle: 'long', timeStyle: 'short' });
+  try { await document.fonts.ready; } catch(_) {}
+  pageCanvas = renderPage(v); pageCanvas.dataset.file = 'Petition-Signature-' + safeName(v.name);
+  $('prev').src = pageCanvas.toDataURL('image/png');
+  $('status').textContent = ''; $('status').className = '';
+  $('done').classList.add('show'); $('done').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+function toBlob(c, type, q){ return new Promise(res => c.toBlob(res, type, q)); }
+function say(msg, bad){ $('status').textContent = msg; $('status').className = bad ? 'bad' : ''; }
+
+async function save(kind){
+  if (!pageCanvas) return;
+  let data, filename = pageCanvas.dataset.file + '.' + kind;
+  if (kind === 'pdf'){
+    const J = window.jspdf && window.jspdf.jsPDF;
+    if (!J){ say('PDF maker didn’t load — try the PNG download instead.', true); return; }
+    const doc = new J({ unit: 'pt', format: 'letter' });
+    doc.addImage(pageCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 612, 792);
+    data = doc.output('blob');
+  } else data = await toBlob(pageCanvas, 'image/png');
+  if (!downloads && window.claude && window.claude.use){
+    try { downloads = await Promise.race([window.claude.use('downloads'), new Promise(r => setTimeout(() => r(null), 2000))]); } catch(_) {}
+  }
+  if (!downloads){
+    // Plain browser download (works when the page is opened directly in Chrome, Safari, etc.)
+    const url = URL.createObjectURL(data), a = document.createElement('a');
+    a.href = url; a.download = filename; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    say('Downloading ' + filename + ' — check your Downloads folder, then send it to the petition organizer.');
+    return;
+  }
+  try {
+    const r = await downloads.save({ filename, data });
+    say(r.status === 'saved' ? 'Saved. Send this file to the petition organizer.' : 'Sent.');
+  } catch (err){
+    const code = err && err.code;
+    if (code === 'declined') say('Download cancelled.');
+    else if (code === 'rate_limited') say('A download prompt is already open — finish that one first.', true);
+    else if (code === 'host_unavailable') say('This app can’t save files. Open the page in a browser or on a computer to download.', true);
+    else say('Couldn’t save the file here. Try opening the page in a browser.', true);
+  }
+}
+$('dlpdf').addEventListener('click', () => save('pdf'));
+$('dlpng').addEventListener('click', () => save('png'));
+$('again').addEventListener('click', () => {
+  $('f').reset(); strokes = []; redraw(); pageCanvas = null;
+  $('done').classList.remove('show'); say('');
+  window.scrollTo({ top: 0, behavior: 'smooth' }); $('name').focus({ preventScroll: true });
+});
+
+if (window.claude && window.claude.use){
+  window.claude.use('downloads').then(d => { downloads = d; }).catch(() => {});
+}
+}
+</script>
+</body>
+</html>
